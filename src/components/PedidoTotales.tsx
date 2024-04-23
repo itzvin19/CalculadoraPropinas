@@ -1,25 +1,24 @@
 import { formatCurrency } from "../helpers";
-import { PedidoItemT} from "../types";
-import { useMemo } from "react";
+import { Dispatch, useMemo } from "react";
 import { tipOptions } from "../data/db";
+import { PedidoActions, PedidoState } from "../reducers/Pedido-reducer";
 
 type PedidoTotalesProps = {
-  pedido: PedidoItemT[];
-  tip:number
-  setTip:React.Dispatch<React.SetStateAction<number>>
+  state: PedidoState;
+  dispatch: Dispatch<PedidoActions>
 };
 
-function PedidoTotales({ pedido ,tip,setTip}: PedidoTotalesProps) {
+function PedidoTotales({ state, dispatch }: PedidoTotalesProps) {
   const subTotalAmount = useMemo(
-    () => pedido.reduce((total, item) => total + item.cantidad * item.price, 0),
-    [pedido]
+    () => state.pedido.reduce((total, item) => total + item.cantidad * item.price, 0),
+    [state.pedido]
   );
 
-  const tipsAmount = useMemo(() => subTotalAmount * tip, [tip,pedido]);
+  const tipsAmount = useMemo(() => subTotalAmount * state.tip, [state.tip, state.pedido]);
 
   const totalAmount = useMemo(
-    () => tipsAmount+subTotalAmount,
-    [pedido,tip]
+    () => tipsAmount + subTotalAmount,
+    [state.pedido, state.tip]
   );
 
   return (
@@ -31,11 +30,11 @@ function PedidoTotales({ pedido ,tip,setTip}: PedidoTotalesProps) {
             {tipOptions.map((item) => (
               <div key={item.id} className="flex justify-between">
                 <span>{item.label}</span>
-                <input type="radio" name="tips" value={item.value} onChange={(e)=>{setTip(+e.target.value)}}></input>
+                <input type="radio" name="tips" value={item.value} onChange={(e) => { dispatch({ type: 'add-tip', payload: { tip: +e.target.value } }) }}></input>
               </div>
             ))}
           </form>
-        </div>
+        </div >
         <div className="flex flex-col items-center justify-center">
           <div>
             <span className="font-bold">Subtotal: </span>
@@ -50,10 +49,12 @@ function PedidoTotales({ pedido ,tip,setTip}: PedidoTotalesProps) {
             <span>{formatCurrency(totalAmount)}</span>
           </div>
         </div>
-      </div>
+      </div >
       <button
         className="col-span-11 bg-teal-900 text-white uppercase duration-100 hover:bg-teal-950
-      p-3"
+      p-3" onClick={() => {
+          dispatch({ type: 'place-order' })
+        }}
       >
         Registrar Pedido
       </button>
