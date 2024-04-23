@@ -1,17 +1,11 @@
+import { useReducer } from "react";
 import MenuItem from "./components/MenuItem";
 import Pedido from "./components/Pedido";
 import { menuItems } from "./data/db";
-import { usePedido } from "./hooks/usePedido";
+import { PedidoReducer, initialState } from "./reducers/Pedido-reducer";
 
 function App() {
-  const {
-    pedido,
-    addToPedido,
-    removeFromPedido,
-    tip,
-    setTip
-  } = usePedido();
-
+  const [state,dispatch]=useReducer(PedidoReducer,initialState)
   return (
     <>
       <header className="bg-teal-400 py-5 shadow-lg">
@@ -25,18 +19,16 @@ function App() {
           <h2 className="text-teal-500 font-black text-2xl">Menu</h2>
           <div className=" border border-teal-500 rounded-md w-5/6 mt-4 shadow-lg max-h-96 overflow-auto">
             {menuItems.map((item) => (
-              <MenuItem key={item.id} item={item} addToPedido={addToPedido} />
+              <MenuItem key={item.id} item={item} dispatch={dispatch} />
             ))}
           </div>
         </div>
         <div>
           <h2 className="text-center text-xl font-black">Consumo</h2>
-          {pedido.length > 0 ? (
+          {state.pedido.length > 0 ? (
             <Pedido
-              pedido={pedido}
-              removeFromPedido={removeFromPedido}
-              tip={tip}
-              setTip={setTip}
+              state={state}
+              dispatch={dispatch}
             ></Pedido>
           ) : (
             <div className=" w-full mt-4 shadow-lg bg-gray-200 p-44 text-center">

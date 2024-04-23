@@ -1,22 +1,20 @@
+import { Dispatch } from "react";
 import { formatCurrency } from "../helpers";
+import { PedidoActions, PedidoState } from "../reducers/Pedido-reducer";
 import { PedidoItemT} from "../types";
 import PedidoTotales from "./PedidoTotales";
 type PedidoT = {
-  pedido: PedidoItemT[];
-  removeFromPedido: (item: PedidoItemT["id"]) => void;
-  tip:number;
-  setTip:React.Dispatch<React.SetStateAction<number>>
+  state: PedidoState;
+  dispatch: Dispatch<PedidoActions>;
 };
 
 function Pedido({
-  pedido,
-  removeFromPedido,
-  tip,
-  setTip
+  state,
+  dispatch
 }: PedidoT) {
   return (
     <div className=" w-full mt-4 shadow-lg text-center p-3  my-3">
-      {pedido.map((item: PedidoItemT) => {
+      {state.pedido.map((item: PedidoItemT) => {
         const { name, price } = item;
         return (
           <div className="flex justify-between p-3 items-center border-b-2">
@@ -31,7 +29,7 @@ function Pedido({
             <button
               className=" bg-teal-900 text-white rounded-full h-6 w-6 text-[0.8rem] col-auto hover:bg-teal-950 duration-100 font-black"
               onClick={() => {
-                removeFromPedido(item.id);
+                dispatch({type:'remove-from-pedido',payload:{id:item.id}});
               }}
             >
               X
@@ -39,7 +37,7 @@ function Pedido({
           </div>
         );
       })}
-      <PedidoTotales pedido={pedido} tip={tip} setTip={setTip}/>
+      <PedidoTotales state={state} dispatch={dispatch}/>
     </div>
   );
 }
